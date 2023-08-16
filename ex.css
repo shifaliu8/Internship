@@ -1,0 +1,38 @@
+.heading h1{
+    text-align: center;
+    color:red;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.textcenter{
+    position:absolute;
+    top: 91%;
+    left:28%;
+    background-color: aliceblue;
+    width: 44%;
+    
+
+}
+.center{
+    position: relative;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    width: 45%;
+
+    
+}
+.image {
+    position: relative;
+    text-align: center;
+    color: black;
+    
+  }
+  .grid-image{
+    display:grid;
+    grid:150px ;
+    grid-gap:10px ;
+    padding:10px
+  }
+  
