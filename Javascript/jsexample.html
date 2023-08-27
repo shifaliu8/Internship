@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Result Table</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+   
+    
+    button {
+      background-color:green;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 10px; /* Rounded corners */
+      cursor: pointer;
+    }
+#studentTable{
+  display: none;
+}
+    /* Add CSS styles for table cells */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 15px;
+      text-align: center;
+    }
+
+    /* Align buttons to the left */
+    .button-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+    
+    .warning {
+      color: red;
+      font-size: 17px;
+      margin-top: -3px;
+      text-align: left;
+    }
+    .arrow {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  
+}
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+th i {
+    margin-left: 35px;
+  }
+
+ </style>
+</head>
+<body>
+  <div class="container bg-light py-5">
+  <h2 style="text-align: center;">Result Table</h2><br>
+
+  <form id="studentForm">
+    <div class="row">
+      <div class="col-lg-12">  
+       
+        <label for="name" ><i class="fa fa-user"></i> Name: </label><br>
+        <input type="text" id="name" required placeholder="Enter name"><br>
+        <div class="warning" id="nameWarning"></div><br>
+        <div class="mb-3">
+          <label for="regNumber"><i class=""></i> Register Number:</label><br>
+          <input type="text" id="regNumber" required placeholder="Enter regNumber" ><br>
+          <div class="warning" id="regNumberWarning"></div>
+        </div>
+        <div class="mb-3">
+          <label for="grade">Grade:</label><br>
+          <input type="text" id="grade" required placeholder="Enter grade"><br>
+          <div class="warning" id="gradeWarning"></div>
+        </div>
+    
+        </div>
+     </div>
+   
+    
+    <div class="button-container">
+      <button type="button" onclick="addStudent()">Submit</button>
+      <button type="button" onclick="clearInputs()">Reset</button>
+    </div>
+
+  <br>
+    <div class="warning" id="warningMessage"></div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+      </div>
+      <input type="text" id="search" class="form-control" placeholder="Search by name, register number, or grade" oninput="searchTable(this)">
+        </div> 
+  </form>
+  
+  <table id="studentTable" border="1">
+    <tr>
+      <th style="cursor: pointer;" onclick="toggleSort(0)">SI No <i class="arrow up"></i></th>
+      <th style="cursor: pointer;" onclick="toggleSort(1)">Name <i class="arrow up"></i></th>
+      <th style="cursor: pointer;" onclick="toggleSort(2)">Register Number <i class="arrow up"></i></th>
+      <th style="cursor: pointer;" onclick="toggleSort(3)">Grade <i class="arrow up"></i></th>
+      <th>Action</th>
+    </tr>
+  </table>
+<div id="noResultMessage" style="display: none; color: red; text-align: center; font-size: large;">No result found</div>
+
+  <script>
+    // ... (existing script) ...
+    const studentTable = document.getElementById('studentTable');
+    const studentForm = document.getElementById('studentForm');
+
+
+    function clearEntireTable() {
+  console.log("Clearing the table...");
+
+  clearTable();
+  clearInputs();
+
+  console.log("Table cleared. Making the table visible.");
+  studentTable.style.display = 'table';
+}
+
+  /* function clearEntireTable() {
+  clearTable();
+  clearInputs();
+  showTable();
+}*/
+
+function clearTable() {
+  while (studentTable.rows.length > 1) {
+    studentTable.deleteRow(1);
+  }
+  studentTable.style.display = 'table';
+}
+
+function editStudent(name, regNumber, grade) {
+  const rowToEdit = findRow(name, regNumber, grade);
+  if (!rowToEdit) {
+    return;
+  }
+
+  const originalData = {
+    name: name,
+    regNumber: regNumber,
+    grade: grade
+  };
+
+  // Create input fields for editing
+  const nameInput = createInputField(name);
+  const regNumberInput = createInputField(regNumber);
+  const gradeInput = createInputField(grade);
+
+  // Replace cell content with input fields
+  rowToEdit.cells[1].textContent = '';
+  rowToEdit.cells[1].appendChild(nameInput);
+
+  rowToEdit.cells[2].textContent = '';
+  rowToEdit.cells[2].appendChild(regNumberInput);
+
+  rowToEdit.cells[3].textContent = '';
+  rowToEdit.cells[3].appendChild(gradeInput);
+
+  const updateButton = document.createElement('button');
+  updateButton.textContent = 'Update';
+  updateButton.classList.add('btn', 'btn-success', 'btn-sm', 'mr-1');
+  
+  let valuesUpdated = false;
+
+
+  nameInput.addEventListener('input', function () {
+    valuesUpdated = true;
+  });
+
+  // Event listener for regNumberInput
+  regNumberInput.addEventListener('input', function () {
+    valuesUpdated = true;
+  });
+
+  // Event listener for gradeInput
+  gradeInput.addEventListener('input', function () {
+    valuesUpdated = true;
+  });
+
+  updateButton.onclick = function() {
+    if (valuesUpdated) {
+    const confirmation = confirm('Are you sure you want to update this student?');
+    if (confirmation) {
+      const updatedName = nameInput.value;
+      const updatedRegNumber = regNumberInput.value;
+      const updatedGrade = gradeInput.value;
+
+      rowToEdit.cells[1].textContent = updatedName;
+      rowToEdit.cells[2].textContent = updatedRegNumber;
+      rowToEdit.cells[3].textContent = updatedGrade;
+
+      // Restore original content for action cell
+      restoreActionCell(rowToEdit, updatedName, updatedRegNumber, updatedGrade);
+
+    }
+    sortTable();
+  }
+  };
+
+  const cancelButton = document.createElement('button');
+  cancelButton.textContent = 'Cancel';
+  cancelButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+  cancelButton.onclick = function() {
+  valuesUpdated = false;
+  cancelEdit(rowToEdit, originalData);
+  restoreActionCell(row, originalData.name, originalData.regNumber, originalData.grade);
+  };
+
+  // Clear the existing action buttons and add the update and cancel button 
+  rowToEdit.cells[4].innerHTML = '';
+  rowToEdit.cells[4].appendChild(updateButton);
+  rowToEdit.cells[4].appendChild(cancelButton);
+}
+
+function restoreActionCell(row, name, regNumber, grade) {
+  row.cells[4].innerHTML = '';
+  const buttonContainer = createEditAndDeleteButtons(name, regNumber, grade);
+  row.cells[4].appendChild(buttonContainer);
+}
+
+function cancelEdit(row, originalData) {
+  // Restore original content for non-action cells
+  row.cells[1].textContent = originalData.name;
+  row.cells[2].textContent = originalData.regNumber;
+  row.cells[3].textContent = originalData.grade;
+
+  // Restore original content for action cell
+  restoreActionCell(row, originalData.name, originalData.regNumber, originalData.grade);
+}
+
+function restoreActionCell(row, name, regNumber, grade) {
+  row.cells[4].innerHTML = '';
+  const buttonContainer = createEditAndDeleteButtons(name, regNumber, grade);
+  row.cells[4].appendChild(buttonContainer);
+}
+
+function createInputField(value) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = value;
+  return input;
+}
+
+function findRow(name, regNumber, grade) {
+  for (let i = 1; i < studentTable.rows.length; i++) {
+    const row = studentTable.rows[i];
+    if (
+      row.cells[1].textContent === name &&
+      row.cells[2].textContent === regNumber &&
+      row.cells[3].textContent === grade
+    ) {
+      return row;
+    }
+  }
+  return null;
+}
+
+
+// ... (other functions) ...
+function deleteStudent(name, regNumber, grade) {
+  const confirmation = confirm('Are you sure you want to delete this student?');
+  if (confirmation) {
+    // Find the row that matches the data
+    for (let i = 1; i < studentTable.rows.length; i++) {
+      const row = studentTable.rows[i];
+      if (
+        row.cells[1].textContent === name &&
+        row.cells[2].textContent === regNumber &&
+        row.cells[3].textContent === grade
+      ) {
+        studentTable.deleteRow(i);
+        break;
+      }
+    }
+    sortTable();
+  }
+}
+
+
+
+
+function clearInputs() {
+    document.getElementById('name').value = '';
+    document.getElementById('regNumber').value = '';
+    document.getElementById('grade').value = '';
+
+    document.getElementById('nameWarning').textContent = '';
+    document.getElementById('regNumberWarning').textContent = '';
+    document.getElementById('gradeWarning').textContent = '';
+
+    document.getElementById('name').classList.remove('is-invalid');
+    document.getElementById('regNumber').classList.remove('is-invalid');
+    document.getElementById('grade').classList.remove('is-invalid');
+  }
+
+  function createEditAndDeleteButtons(name, regNumber, grade) {
+  const buttonContainer = document.createElement('div');
+
+  // Create Edit button
+  const editButton = document.createElement('button');
+  editButton.textContent = 'Edit';
+  editButton.classList.add('btn', 'btn-primary', 'btn-sm', 'mr-1');
+  editButton.onclick = function() {
+    editStudent(name, regNumber, grade);
+  };
+
+  // Create Delete button
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+  deleteButton.onclick = function() {
+    deleteStudent(name, regNumber, grade);
+  };
+
+  // Append buttons to the container
+  buttonContainer.appendChild(editButton);
+  buttonContainer.appendChild(deleteButton);
+
+  return buttonContainer;
+}
+
+
+
+/*function sortTable(column) {
+  const rows = Array.from(studentTable.rows).slice(1); // Exclude header row
+
+  // Debugging: Check rows and cells before sorting
+  console.log("Rows before sorting:", rows);
+
+  rows.sort((a, b) => {
+    const aValue = a.cells[column].textContent.toLowerCase();
+    const bValue = b.cells[column].textContent.toLowerCase();
+    return aValue.localeCompare(bValue);
+  });
+
+  // Debugging: Check rows and cells after sorting
+  console.log("Rows after sorting:", rows);
+
+  while (studentTable.rows.length > 1) {
+    studentTable.deleteRow(1);
+  }
+
+  for (const row of rows) {
+    studentTable.appendChild(row);
+  }
+}*/
+
+const arrowIcons = document.querySelectorAll('.arrow'); // Get all arrow icons
+const sortInfo = {
+  column: 'Name',
+  ascending: true,
+};
+
+function toggleSort(column) {
+  if (sortInfo.column === column) {
+    sortInfo.ascending = !sortInfo.ascending; // Toggle sorting order
+  } else {
+    sortInfo.column = column; // Set the current column
+    sortInfo.ascending = true; // Reset sorting order to ascending
+  }
+
+  sortTable(column); // Call the sorting function
+
+  // Update arrow icons based on sorting order
+  arrowIcons.forEach((arrow, index) => {
+    if (index === column) {
+      arrow.classList.toggle('up', sortInfo.ascending); // Add 'up' class if ascending
+      arrow.classList.toggle('down', !sortInfo.ascending); // Add 'down' class if descending
+    } else {
+      arrow.classList.remove('up', 'down'); // Remove both classes from other columns
+    }
+  });
+}
+function sortTable(column) {
+  const rows = Array.from(studentTable.rows).slice(1); // Exclude header row
+  rows.sort((a, b) => {
+    const aValue = a.cells[column].textContent.toLowerCase();
+    const bValue = b.cells[column].textContent.toLowerCase();
+    const comparison = aValue.localeCompare(bValue);
+
+    // Adjust the comparison based on sorting order
+    return sortInfo.ascending ? comparison : -comparison;
+  });
+
+  // Clear the table and append sorted rows
+  while (studentTable.rows.length > 1) {
+    studentTable.deleteRow(1);
+  }
+  for (const row of rows) {
+    studentTable.appendChild(row);
+  }
+}
+
+
+
+
+
+function searchTable(inputElement) {
+  const searchKeyword = inputElement.value.toLowerCase();
+  const rows = studentTable.getElementsByTagName('tr');
+
+  let foundMatch = false;
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    let foundInRow = false;
+
+    for (let j = 1; j < row.cells.length - 1; j++) {
+      const cellValue = row.cells[j].textContent.toLowerCase();
+      if (cellValue.includes(searchKeyword)) {
+        foundInRow = true;
+        break;
+      }
+    }
+
+    if (foundInRow) {
+      row.style.display = '';
+      foundMatch = true;
+    } else {
+      row.style.display = 'none';
+    }
+  }
+
+  const noResultMessage = document.getElementById('noResultMessage');
+  if (foundMatch) {
+    noResultMessage.style.display = 'none';
+  } else {
+    noResultMessage.style.display = 'block';
+  }
+}
+
+
+
+function addStudent() {
+
+const name = document.getElementById('name').value;
+const regNumber = document.getElementById('regNumber').value;
+const grade = document.getElementById('grade').value;
+
+const nameWarning = document.getElementById('nameWarning');
+const regNumberWarning = document.getElementById('regNumberWarning');
+const gradeWarning = document.getElementById('gradeWarning');
+
+nameWarning.textContent = '';
+regNumberWarning.textContent = '';
+gradeWarning.textContent = '';
+
+
+
+
+if (name === ''||!/^[a-zA-Z]+$/.test(name)) {
+  nameWarning.textContent = 'Please fill in the Name field.';
+  document.getElementById('name').focus();
+  return false;
+}
+
+if (regNumber === ''||!/^\d{10}$/.test(regNumber)) {
+  regNumberWarning.textContent = 'Please fill in the Register Number field.';
+  document.getElementById('regNumber').focus();
+return false;
+}
+
+if (grade === ''||!/^(?:100|\d{1,2})$/.test(grade)) {
+  gradeWarning.textContent = 'Please fill in the Grade field.';
+  document.getElementById('grade').focus();
+ return false;
+}
+
+
+
+// Clear warning messages
+document.getElementById('warningMessage').textContent = '';
+nameWarning.textContent = '';
+regNumberWarning.textContent = '';
+gradeWarning.textContent = '';
+
+
+
+
+const newRow = studentTable.insertRow(-1);
+const cell1 = newRow.insertCell(0);
+const cell2 = newRow.insertCell(1);
+const cell3 = newRow.insertCell(2);
+const cell4 = newRow.insertCell(3);
+const cell5 = newRow.insertCell(4); // New action cell
+
+cell1.innerHTML = studentTable.rows.length - 1;
+cell2.innerHTML = name;
+cell3.innerHTML = regNumber;
+cell4.innerHTML = grade;
+
+const editButton = document.createElement('button');
+editButton.textContent = 'Edit';
+editButton.classList.add('btn', 'btn-primary', 'btn-sm', 'mr-1');
+editButton.onclick = function() {
+  editStudent(name, regNumber, grade);
+};
+
+const deleteButton = document.createElement('button');
+deleteButton.textContent = 'Delete';
+deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+deleteButton.onclick = function() {
+  deleteStudent(name, regNumber, grade);
+};
+cell5.appendChild(editButton);
+cell5.appendChild(deleteButton);
+
+sortTable();
+clearInputs();
+studentTable.style.display = 'table';
+}
+
+
+  </script>
+  
+  <div class="button-container">
+    <button type="button" id="btn" onclick="studentTable.remove(),btn.remove(),btn1.remove()"> Clear Table</button> 
+    <button type="button" id="btn1" onclick="clearTable()">Clear</button>
+  </div>
+  </div>
+
+</body>
+</html>
