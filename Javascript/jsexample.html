@@ -74,7 +74,7 @@ th i {
         <div class="warning" id="nameWarning"></div><br>
         <div class="mb-3">
           <label for="regNumber"><i class=""></i> Register Number:</label><br>
-          <input type="text" id="regNumber" required placeholder="Enter regNumber" ><br>
+          <input type="text" id="regNumber" required placeholder="Enter Register Number" ><br>
           <div class="warning" id="regNumberWarning"></div>
         </div>
         <div class="mb-3">
@@ -114,34 +114,28 @@ th i {
 <div id="noResultMessage" style="display: none; color: red; text-align: center; font-size: large;">No result found</div>
 
   <script>
-    // ... (existing script) ...
+   
     const studentTable = document.getElementById('studentTable');
     const studentForm = document.getElementById('studentForm');
-
-
-    function clearEntireTable() {
-  console.log("Clearing the table...");
-
-  clearTable();
-  clearInputs();
-
-  console.log("Table cleared. Making the table visible.");
-  studentTable.style.display = 'table';
-}
-
-  /* function clearEntireTable() {
-  clearTable();
-  clearInputs();
-  showTable();
-}*/
-
+  
+//To hide the Table 
+function clearTableAndHideTable() {
+    studentTable.style.display = 'none'; 
+    btn.style.display = 'none'; 
+    btn1.style.display = 'none'; 
+    clearTable()
+  
+    
+    
+  }
+// to clear the rows
 function clearTable() {
   while (studentTable.rows.length > 1) {
     studentTable.deleteRow(1);
   }
-  studentTable.style.display = 'table';
+  //studentTable.style.display = 'table';
 }
-
+//to edit the values entered in the table
 function editStudent(name, regNumber, grade) {
   const rowToEdit = findRow(name, regNumber, grade);
   if (!rowToEdit) {
@@ -172,22 +166,26 @@ function editStudent(name, regNumber, grade) {
   const updateButton = document.createElement('button');
   updateButton.textContent = 'Update';
   updateButton.classList.add('btn', 'btn-success', 'btn-sm', 'mr-1');
-  
+  updateButton.disabled = true;
+
   let valuesUpdated = false;
 
 
   nameInput.addEventListener('input', function () {
     valuesUpdated = true;
+    updateButton.disabled = false;
   });
 
   // Event listener for regNumberInput
   regNumberInput.addEventListener('input', function () {
     valuesUpdated = true;
+    updateButton.disabled = false;
   });
 
   // Event listener for gradeInput
   gradeInput.addEventListener('input', function () {
     valuesUpdated = true;
+    updateButton.disabled = false;
   });
 
   updateButton.onclick = function() {
@@ -204,6 +202,7 @@ function editStudent(name, regNumber, grade) {
 
       // Restore original content for action cell
       restoreActionCell(rowToEdit, updatedName, updatedRegNumber, updatedGrade);
+      
 
     }
     sortTable();
@@ -269,7 +268,7 @@ function findRow(name, regNumber, grade) {
 }
 
 
-// ... (other functions) ...
+
 function deleteStudent(name, regNumber, grade) {
   const confirmation = confirm('Are you sure you want to delete this student?');
   if (confirmation) {
@@ -290,8 +289,7 @@ function deleteStudent(name, regNumber, grade) {
 }
 
 
-
-
+//To clear the input fields
 function clearInputs() {
     document.getElementById('name').value = '';
     document.getElementById('regNumber').value = '';
@@ -331,32 +329,6 @@ function clearInputs() {
 
   return buttonContainer;
 }
-
-
-
-/*function sortTable(column) {
-  const rows = Array.from(studentTable.rows).slice(1); // Exclude header row
-
-  // Debugging: Check rows and cells before sorting
-  console.log("Rows before sorting:", rows);
-
-  rows.sort((a, b) => {
-    const aValue = a.cells[column].textContent.toLowerCase();
-    const bValue = b.cells[column].textContent.toLowerCase();
-    return aValue.localeCompare(bValue);
-  });
-
-  // Debugging: Check rows and cells after sorting
-  console.log("Rows after sorting:", rows);
-
-  while (studentTable.rows.length > 1) {
-    studentTable.deleteRow(1);
-  }
-
-  for (const row of rows) {
-    studentTable.appendChild(row);
-  }
-}*/
 
 const arrowIcons = document.querySelectorAll('.arrow'); // Get all arrow icons
 const sortInfo = {
@@ -404,10 +376,7 @@ function sortTable(column) {
   }
 }
 
-
-
-
-
+//To search the contents
 function searchTable(inputElement) {
   const searchKeyword = inputElement.value.toLowerCase();
   const rows = studentTable.getElementsByTagName('tr');
@@ -448,7 +417,7 @@ function addStudent() {
 
 const name = document.getElementById('name').value;
 const regNumber = document.getElementById('regNumber').value;
-const grade = document.getElementById('grade').value;
+const grade = document.getElementById('grade').value
 
 const nameWarning = document.getElementById('nameWarning');
 const regNumberWarning = document.getElementById('regNumberWarning');
@@ -457,6 +426,11 @@ const gradeWarning = document.getElementById('gradeWarning');
 nameWarning.textContent = '';
 regNumberWarning.textContent = '';
 gradeWarning.textContent = '';
+
+studentTable.style.display = 'table';
+    btn.style.display = 'inline-block'; // Show the Clear Table button
+    btn1.style.display = 'inline-block'; // Show the Clear button
+  
 
 
 
@@ -521,13 +495,14 @@ cell5.appendChild(deleteButton);
 sortTable();
 clearInputs();
 studentTable.style.display = 'table';
-}
 
+}
 
   </script>
   
   <div class="button-container">
-    <button type="button" id="btn" onclick="studentTable.remove(),btn.remove(),btn1.remove()"> Clear Table</button> 
+    <button type="button" id="btn" onclick="clearTableAndHideTable()"> Clear Table</button>
+    <!--<button type="button" id="btn" onclick="studentTable.remove(),btn.remove(),btn1.remove()"> Clear Table</button> -->
     <button type="button" id="btn1" onclick="clearTable()">Clear</button>
   </div>
   </div>
