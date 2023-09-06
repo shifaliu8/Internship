@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color:lightgrey;
+  background-image: linear-gradient(315deg, lightgrey, lightgrey 74%);
+}
+/* Add this to your CSS file */
+.operator-button {
+  background-color: orange; /* Change the background color to your preferred color */
+  color: white; /* Change the text color to make it readable */
+}
+
+.operator-text {
+  color: red; /* Change the text color to your preferred color */
+}
